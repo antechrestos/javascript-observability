@@ -1,0 +1,26 @@
+{
+  "name": "observabilite",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start-api": "node bin/api.js",
+    "start-bff": "node bin/bff.js",
+    "start-email-service": "node bin/email-service.js"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.67.2",
+    "@opentelemetry/context-async-hooks": "^2.2.0",
+    "@opentelemetry/core": "^2.2.0",
+    "@opentelemetry/exporter-metrics-otlp-proto": "^0.208.0",
+    "@opentelemetry/exporter-trace-otlp-proto": "^0.208.0",
+    "@opentelemetry/instrumentation-winston": "^0.53.0",
+    "@opentelemetry/sdk-node": "^0.208.0",
+    "amqplib": "^0.10.9",
+    "cookie-parser": "~1.4.4",
+    "express": "~4.16.1",
+    "express-winston": "^4.2.0",
+    "http-errors": "~1.6.3",
+    "winston": "^3.19.0"
+  }
+}

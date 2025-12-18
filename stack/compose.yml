@@ -1,0 +1,84 @@
+services:
+  rabbitmq-broker:
+    image: rabbitmq:3.9.8-management
+#    container_name: ${RABBITMQ_HOST}
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USERNAME}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VIRTUAL_HOST}
+    mem_reservation: 200M
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - demo-observabilite
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "check_alarms" ]
+
+  monitoring-grafana:
+    image: grafana/grafana-oss:9.3.2
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./config/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/default.yaml:ro
+#    configs:
+#      - source: grafana
+#        target: /etc/grafana/provisioning/datasources/default.yaml
+    networks:
+      - demo-observabilite
+
+  monitoring-tempo:
+    image: grafana/tempo:1.5.0
+    command: --config.file=/etc/tempo/config.yml
+    volumes:
+      - ./config/tempo.yml:/etc/tempo/config.yml:ro
+#    configs:
+#      - source: tempo
+#        target: /etc/tempo/config.yml
+    networks:
+      - demo-observabilite
+
+  monitoring-prometheus:
+    image: prom/prometheus:v2.41.0
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+#    configs:
+#      - source: prometheus
+#        target: /etc/prometheus/prometheus.yml
+    networks:
+      - demo-observabilite
+
+  monitoring-otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.95.0
+    command: [ "--config=/etc/otel-collector/config.yml" ]
+    ports:
+      - "4318:4318"
+    volumes:
+      - ./config/otel-collector.yml:/etc/otel-collector/config.yml:ro
+#    configs:
+#      - source: otel-collector
+#        target: /etc/otel-collector/config.yml
+    networks:
+      - demo-observabilite
+
+volumes:
+  rabbitmq-data:
+
+networks:
+  demo-observabilite:
+
+#configs:
+#  grafana:
+#    file: ./config/grafana-datasources.yaml
+#  prometheus:
+#    file: ./config/prometheus.yml
+#  tempo:
+#    file: ./config/tempo.yml
+#  otel-collector:
+#    file: ./config/otel-collector.yml
+
